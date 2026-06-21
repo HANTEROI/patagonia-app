@@ -346,6 +346,43 @@
     .leaflet-control-attribution { font-size: 9px !important; }
     .tag { display: inline-flex; align-items: center; gap: 3px; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px; }
 
+
+    .empty-state { text-align:center; padding:48px 20px; color:var(--text3); }
+    .empty-icon  { font-size:40px; margin-bottom:12px; }
+    .empty-title { font-size:16px; font-weight:600; color:var(--text2); margin-bottom:6px; }
+    .empty-sub   { font-size:13px; line-height:1.6; }
+    .btn-icon.active-mode { background:var(--accent); color:#fff; border-color:var(--accent); }
+    .point-field { }
+    .point-field-label { font-size:9px; text-transform:uppercase; letter-spacing:.1em; color:var(--text3); font-weight:600; margin-bottom:2px; }
+    .point-field-value { font-size:12px; color:var(--text1); }
+    .point-field.full  { grid-column:1/-1; }
+    .point-coords { font-size:11px; color:var(--accent2); font-family:monospace; cursor:pointer; }
+    .point-coords:hover { text-decoration:underline; }
+    .point-link   { font-size:11px; color:var(--accent); }
+    .point-card   { background:var(--surface); border-radius:var(--radius); border:1px solid var(--border); margin-bottom:8px; overflow:hidden; box-shadow:var(--shadow); transition:all .15s; }
+    .point-card:hover { box-shadow:var(--shadow-md); }
+    .point-card.done  { opacity:.55; }
+    .point-header { display:flex; align-items:center; gap:10px; padding:11px 13px; cursor:pointer; }
+    .point-cat-badge { display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:600; padding:2px 8px; border-radius:99px; white-space:nowrap; flex-shrink:0; }
+    .point-name   { font-size:13px; font-weight:600; color:var(--text1); flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .point-check  { width:20px; height:20px; border-radius:50%; border:1.5px solid var(--border2); background:transparent; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:10px; color:transparent; transition:all .15s; flex-shrink:0; }
+    .point-check.checked { background:var(--accent); border-color:var(--accent); color:#fff; }
+    .point-body   { border-top:1px solid var(--border); padding:12px 13px; background:var(--bg2); display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .point-actions { display:flex; gap:6px; padding:0 13px 12px; }
+    .point-btn    { padding:5px 12px; border-radius:var(--radius); font-size:11px; font-weight:600; cursor:pointer; border:1px solid var(--border); background:var(--surface); color:var(--text2); transition:all .12s; }
+    .point-btn:hover { background:var(--bg2); }
+    .point-btn.danger { color:var(--red); border-color:var(--red); }
+    .cat-hospedagem  { background:#EFF6FF; color:#1D4ED8; }
+    .cat-turistico   { background:#FDF4FF; color:#7E22CE; }
+    .cat-passeio     { background:#F0FDF4; color:#15803D; }
+    .cat-apoio       { background:#FFF7ED; color:#C2410C; }
+    .cat-carro       { background:#F0F9FF; color:#0369A1; }
+    .cat-posto       { background:#FEFCE8; color:#A16207; }
+    .cat-restaurante { background:#FFF1F2; color:#BE123C; }
+    .cat-camping     { background:#F7FEE7; color:#3F6212; }
+    .cat-mirante     { background:#FFFBEB; color:#B45309; }
+    .cat-fronteira   { background:#F8FAFC; color:#475569; }
+
     @media (max-width: 768px) {
       .content { flex-direction: column; }
       .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); max-height: 42vh; }
