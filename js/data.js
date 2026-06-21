@@ -1,23 +1,27 @@
 // ─── js/data.js ──────────────────────────────────────────────────────────────
 
 const PIN_CATEGORIES = [
-  { id:"entrada", label:"🚪 Entrada de parque", color:"#E74C3C" },
-  { id:"camping", label:"⛺ Camping",            color:"#27AE60" },
-  { id:"vista",   label:"🌄 Vista / mirante",    color:"#8E44AD" },
-  { id:"comida",  label:"🍽️ Restaurante / loja",  color:"#E67E22" },
-  { id:"posto",   label:"⛽ Posto de gasolina",  color:"#F39C12" },
-  { id:"info",    label:"📍 Ponto de interesse", color:"#2980B9" },
+  { id:"hospedagem",  label:"🛏️ Hospedagem",       cls:"cat-hospedagem",  color:"#1D4ED8" },
+  { id:"turistico",   label:"🏛️ Ponto Turístico",   cls:"cat-turistico",   color:"#7E22CE" },
+  { id:"passeio",     label:"🎯 Passeio",            cls:"cat-passeio",     color:"#15803D" },
+  { id:"apoio",       label:"🏙️ Cidade de Apoio",    cls:"cat-apoio",       color:"#C2410C" },
+  { id:"carro",       label:"🚗 Locação de Carro",   cls:"cat-carro",       color:"#0369A1" },
+  { id:"posto",       label:"⛽ Posto / Serviço",    cls:"cat-posto",       color:"#A16207" },
+  { id:"restaurante", label:"🍽️ Restaurante",         cls:"cat-restaurante", color:"#BE123C" },
+  { id:"camping",     label:"🏕️ Camping",             cls:"cat-camping",     color:"#3F6212" },
+  { id:"mirante",     label:"🌄 Mirante / Vista",    cls:"cat-mirante",     color:"#B45309" },
+  { id:"fronteira",   label:"🛂 Fronteira / Balsa",  cls:"cat-fronteira",   color:"#475569" },
 ];
 
 const REGION_COLORS = {
-  "Ruta 40":"#8B6914",
-  "Carretera Austral":"#1B6B3A",
-  "Ruta 40 / Chaltén":"#4A7C59",
-  "Torres del Paine":"#C0392B",
-  "Punta Arenas":"#2471A3",
-  "Terra do Fogo":"#1A5276",
-  "Ushuaia":"#0E6655",
-  "Retorno":"#5D6D7E",
+  "Ruta 40":           "#8B6914",
+  "Carretera Austral": "#1B6B3A",
+  "Ruta 40 / Chaltén": "#4A7C59",
+  "Torres del Paine":  "#C0392B",
+  "Punta Arenas":      "#2471A3",
+  "Terra do Fogo":     "#1A5276",
+  "Ushuaia":           "#0E6655",
+  "Retorno":           "#5D6D7E",
 };
 
 const RESERVAS = [
@@ -38,9 +42,9 @@ const RESERVAS = [
 
 const DEFAULT_DAYS = [
   { id:1,  date:"16/12", emoji:"🚗", title:"Bariloche → Perito Moreno (ARG)",                  region:"Ruta 40",           drive:"~800 km",         stays:"Perito Moreno (ARG)",        lat:-46.4333, lng:-70.9333, highlights:["Dia de estrada pela Ruta 40","Abastecer em Bariloche antes de sair","Paisagem de estepe patagônica"], tip:"Saída bem cedo — dia mais puxado em km. Ótimo para audiobooks.", paleo:null, alert:null },
-  { id:2,  date:"17/12", emoji:"🌊", title:"Perito Moreno → Chile Chico → Río Tranquilo",      region:"Carretera Austral",  drive:"~5h + fronteira",  stays:"Puerto Río Tranquilo (CHI)", lat:-46.6167, lng:-72.6667, highlights:["Cruzar fronteira ARG→CHI em Los Antiguos / Chile Chico","Contornar o Lago General Carrera — um dos maiores da América do Sul","Estrada mais cênica e sinuosa da Patagônia","Capelas de Mármore ao entardecer (~$15 USD por barco)"], tip:"Chegar antes das 17h para o barco das Capelas.", paleo:null, alert:null },
-  { id:3,  date:"18/12", emoji:"🧊", title:"Expedição Laguna San Rafael",                      region:"Carretera Austral",  drive:"Dia de barco",     stays:"Puerto Río Tranquilo (CHI)", lat:-46.6333, lng:-73.8833, highlights:["Valle Exploradores — estrada entre geleiras e cachoeiras","Navegação pelos fiordes até o Glaciar San Rafael","Icebergs flutuando na laguna","Campo de Gelo Norte: ~4.200 km²"], tip:null, paleo:"🧊 Campo de Gelo Norte: relíquia da última glaciação. San Rafael é um dos glaciares mais acessíveis desse sistema.", alert:"⚠️ RESERVAR COM MESES DE ANTECEDÊNCIA. Operadoras: Turismo Exploradores ou Destino Patagonia. Passeio depende do clima." },
-  { id:4,  date:"19/12", emoji:"🛤️", title:"Río Tranquilo → Chile Chico → Gobernador Gregores",region:"Ruta 40",           drive:"~480 km + front.",  stays:"Gobernador Gregores (ARG)", lat:-48.7667, lng:-70.25,   highlights:["Retorno contornando o Lago General Carrera","Cruzar CHI→ARG em Chile Chico","Trechos de rípio (cascalho) na Ruta 40","Parada estratégica em Gregores"], tip:"Pneu reserva em boas condições para o rípio.", paleo:null, alert:"⚠️ Confirmar com locadora autorização para múltiplas travessias ARG/CHI." },
+  { id:2,  date:"17/12", emoji:"🌊", title:"Perito Moreno → Chile Chico → Río Tranquilo",      region:"Carretera Austral",  drive:"~5h + fronteira",  stays:"Puerto Río Tranquilo (CHI)", lat:-46.6167, lng:-72.6667, highlights:["Cruzar fronteira ARG→CHI em Los Antiguos / Chile Chico","Contornar o Lago General Carrera – um dos maiores da América do Sul","Estrada mais cênica e sinuosa da Patagônia","Capelas de Mármore ao entardecer (~$15 USD por barco)"], tip:"Chegar antes das 17h para o barco das Capelas.", paleo:null, alert:null },
+  { id:3,  date:"18/12", emoji:"🧊", title:"Expedição Laguna San Rafael",                      region:"Carretera Austral",  drive:"Dia de barco",     stays:"Puerto Río Tranquilo (CHI)", lat:-46.6333, lng:-73.8833, highlights:["Valle Exploradores – estrada entre geleiras e cachoeiras","Navegação pelos fiordes até o Glaciar San Rafael","Icebergs flutuando na laguna","Campo de Gelo Norte: ~4.200 km²"], tip:null, paleo:"🧊 Campo de Gelo Norte: relíquia da última glaciação. San Rafael é um dos glaciares mais acessíveis desse sistema.", alert:"⚠️ RESERVAR COM MESES DE ANTECEDÊNCIA. Operadoras: Turismo Exploradores ou Destino Patagonia." },
+  { id:4,  date:"19/12", emoji:"🛤️", title:"Río Tranquilo → Chile Chico → Gobernador Gregores",region:"Ruta 40",           drive:"~480 km + front.",  stays:"Gobernador Gregores (ARG)", lat:-48.7667, lng:-70.25,   highlights:["Retorno contornando o Lago General Carrera","Cruzar CHI→ARG em Chile Chico","Trechos de rípio (cascalho) na Ruta 40"], tip:"Pneu reserva em boas condições para o rípio.", paleo:null, alert:"⚠️ Confirmar com locadora autorização para múltiplas travessias ARG/CHI." },
   { id:5,  date:"20/12", emoji:"🏔️", title:"Gobernador Gregores → El Chaltén",                region:"Ruta 40 / Chaltén",  drive:"~300 km",          stays:"El Chaltén (ARG)",          lat:-49.3333, lng:-72.8833, highlights:["Trecho mais curto após sequência de estrada","Chegada ao pé do Monte Fitz Roy","Mirador de los Cóndores (trilha leve de 1h)","El Chaltén tem ótimas cervejarias artesanais"], tip:"Descansar e aclimatar para a trilha grande do dia seguinte.", paleo:null, alert:null },
   { id:6,  date:"21/12", emoji:"🗻", title:"El Chaltén — Laguna de los Tres (Fitz Roy)",       region:"Ruta 40 / Chaltén",  drive:"Dia de trilha",    stays:"El Chaltén (ARG)",          lat:-49.3167, lng:-72.9667, highlights:["Trilha Laguna de los Tres — 21km, ~8h, 800m de desnível","Vista do Fitz Roy refletido na laguna turquesa","Laguna Sucia (opcional na volta)","Uma das trilhas mais icônicas da América do Sul"], tip:"Sair às 6h. Levar marmita e roupa de vento — a laguna é muito exposta.", paleo:null, alert:null },
   { id:7,  date:"22/12", emoji:"🧊", title:"El Chaltén → El Calafate → Glaciar Perito Moreno", region:"Ruta 40 / Chaltén",  drive:"~210 km",          stays:"El Calafate (ARG)",         lat:-50.3375, lng:-72.2648, highlights:["Deslocamento curto pela manhã (~3h)","Passarelas do Glaciar Perito Moreno à tarde","Um dos poucos glaciares que ainda avança no mundo","Estrondos das placas de gelo caindo na água"], tip:"Entrada no parque Los Glaciares ~$25 USD. Tarde suficiente para ver tudo.", paleo:"🧊 Perito Moreno avança ~2m por dia enquanto a maioria dos glaciares recua. Fenômeno geológico raro.", alert:null },
