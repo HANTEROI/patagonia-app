@@ -34,7 +34,7 @@ function render() {
         <button class="nav-tab ${state.view === "list"     ? "active" : ""}" onclick="setState({view:'list'})">📅 Roteiro</button>
         <button class="nav-tab ${state.view === "reservas" ? "active" : ""}" onclick="setState({view:'reservas'})">✅ Reservas</button>
         <button class="nav-tab ${state.view === "paleo"    ? "active" : ""}" onclick="setState({view:'paleo'})">🦕 Paleo</button>
-        ${state.token ? `<button class="nav-tab ml-auto" onclick="setState({view:'usuarios'})">👥</button>` : ""}
+        ${state.token ? `<button class="nav-tab ${state.view === "usuarios" ? "active" : ""} ml-auto" onclick="setState({view:'usuarios'})">👥</button>` : ""}
         <button class="nav-tab ${state.token ? "" : "ml-auto"}" onclick="setState({adding:true})">＋</button>
       </div>
     </div>
@@ -52,6 +52,10 @@ function render() {
     requestAnimationFrame(() => {
       initMap();
       updateMapMarkers();
+      if (state.selectedId && mapInst) {
+        const d = state.days.find(x => x.id === state.selectedId);
+        if (d) mapInst.setView([d.lat, d.lng], 9, { animate: true });
+      }
     });
   }
 }
@@ -60,15 +64,70 @@ function render() {
 function renderMapView() {
   const sel = state.days.find(d => d.id === state.selectedId);
   return `
-    <div class="map-hint">
-      💡 <b>Toque no mapa</b> para adicionar um ponto personalizado
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-header-title">🌎 Patagônia · 16/12 – 12/01</div>
+        <div class="sidebar-subtitle">${state.days.length} dias · ${Object.values(state.checked).filter(Boolean).length} concluídos</div>
+        <input
+          class="sidebar-search"
+          placeholder="🔍 Buscar dia ou local..."
+          oninput="filterSidebar(this.value)"
+          id="sidebar-search"
+        />
+      </div>
+      <div class="sidebar-list" id="sidebar-list">
+        ${renderSidebarItems(state.days)}
+      </div>
     </div>
-    <div id="map"></div>
-    ${sel ? `<div class="detail-wrap">${renderDetailPanel(sel)}</div>` : ""}
-    <div class="day-list">
-      ${state.days.map(d => renderDayRow(d, false)).join("")}
+
+    <div class="map-panel">
+      <div id="map"></div>
+      ${sel ? `
+        <div class="detail-drawer" id="detail-drawer">
+          <div class="drawer-handle"></div>
+          <button class="drawer-close" onclick="setState({selectedId:null})">✕</button>
+          <button class="drawer-edit-btn" onclick="openEdit(${sel.id})">✏️ Editar</button>
+          <div class="detail-region">${sel.region}</div>
+          <div class="detail-title">${sel.emoji} ${sel.title}</div>
+          <div class="detail-meta">📍 ${sel.stays} &nbsp;·&nbsp; 🚗 ${sel.drive}</div>
+          <div class="highlights">
+            ${sel.highlights.map(h => `
+              <div class="highlight-item">
+                <span class="hl-arrow" style="color:${REGION_COLORS[sel.region]||"#4ECDC4"}">→</span>${h}
+              </div>`).join("")}
+          </div>
+          ${sel.tip   ? `<div class="box-tip">💡 ${sel.tip}</div>`   : ""}
+          ${sel.paleo ? `<div class="box-paleo">${sel.paleo}</div>` : ""}
+          ${sel.alert ? `<div class="box-alert">${sel.alert}</div>` : ""}
+          ${state.token ? renderMediaSection(sel) : `
+            <div class="drive-cta">
+              <p>🔗 Conecte o Google Drive para adicionar fotos e escrever o diário</p>
+              <button class="btn-drive" onclick="signIn()">Conectar Drive</button>
+            </div>`}
+        </div>` : `
+        <div class="map-hint-float">
+          💡 Clique em um marcador para ver detalhes · Clique no mapa para adicionar ponto
+        </div>`}
     </div>
   `;
+}
+
+// ─── SIDEBAR ─────────────────────────────────────────────────────────────────
+function renderSidebarItems(days) {
+  const regions = [...new Set(days.map(d => d.region))];
+  return regions.map(region => {
+    const color = REGION_COLORS[region] || "#555";
+    return `
+      <div class="region-group">
+        <div class="region-divider">
+          <div class="region-line" style="background:${color}"></div>
+          <span class="region-label" style="color:${color}">${region}</span>
+          <div class="region-line" style="background:${color}"></div>
+        </div>
+        ${days.filter(d => d.region === region).map(d => renderDayRow(d, false)).join("")}
+      </div>
+    `;
+  }).join("");
 }
 
 // ─── LIST VIEW ───────────────────────────────────────────────────────────────
@@ -91,11 +150,37 @@ function renderListView() {
 
 // ─── DAY ROW ─────────────────────────────────────────────────────────────────
 function renderDayRow(day, expandable) {
-  const color  = REGION_COLORS[day.region] || "#555";
-  const isSel  = day.id === state.selectedId;
-  const isDone = state.checked[day.id];
+  const color    = REGION_COLORS[day.region] || "#555";
+  const isSel    = day.id === state.selectedId;
+  const isDone   = state.checked[day.id];
   const showDetail = expandable && isSel;
 
+  // Na sidebar (não expandable): item enxuto com click que seleciona + zoom
+  if (!expandable) {
+    return `
+      <div class="day-card sidebar-row ${isDone ? "done" : ""} ${isSel ? "selected" : ""}"
+           onclick="selectDay(${day.id})">
+        <div class="day-header">
+          <button class="day-check ${isDone ? "checked" : ""}"
+                  onclick="event.stopPropagation();toggleCheck(${day.id})">✓</button>
+          <div class="day-bar" style="background:${color}"></div>
+          <span class="day-emoji">${day.emoji}</span>
+          <div class="day-info">
+            <div class="day-meta">
+              <span class="day-date">${day.date}</span>
+              <span class="day-drive">${day.drive}</span>
+            </div>
+            <div class="day-title">${day.title}</div>
+            <div class="day-stays">📍 ${day.stays}</div>
+          </div>
+          <button class="day-edit-btn"
+                  onclick="event.stopPropagation();openEdit(${day.id})">✏️</button>
+        </div>
+      </div>
+    `;
+  }
+
+  // Na aba Roteiro (expandable): card com detalhe inline
   return `
     <div class="day-card ${isDone ? "done" : ""} ${isSel ? "selected" : ""}"
          onclick="toggleSelect(${day.id})">
@@ -120,7 +205,7 @@ function renderDayRow(day, expandable) {
   `;
 }
 
-// ─── DETAIL PANEL ────────────────────────────────────────────────────────────
+// ─── DETAIL PANEL (aba Roteiro) ───────────────────────────────────────────────
 function renderDetailPanel(day) {
   const color     = REGION_COLORS[day.region] || "#555";
   const mediaList = state.media[day.id] || [];
@@ -137,52 +222,55 @@ function renderDetailPanel(day) {
         </div>
         <button onclick="openEdit(${day.id})" class="btn-edit-sm">✏️ Editar</button>
       </div>
-
       <div class="highlights">
         ${day.highlights.map(h => `
           <div class="highlight-item">
             <span class="hl-arrow" style="color:${color}">→</span>${h}
           </div>`).join("")}
       </div>
-
-      ${day.tip   ? `<div class="box-tip">💡 ${day.tip}</div>`     : ""}
-      ${day.paleo ? `<div class="box-paleo">${day.paleo}</div>`    : ""}
-      ${day.alert ? `<div class="box-alert">${day.alert}</div>`    : ""}
-
-      ${state.token ? `
-        <div class="media-section">
-          <div class="section-divider"><div></div><span>Fotos e Vídeos</span><div></div></div>
-          ${mediaList.length ? `
-            <div class="media-grid">
-              ${mediaList.map(m => `
-                <div class="media-thumb" onclick="openLightbox('${m.url}','${m.mimeType}')">
-                  ${m.mimeType.startsWith("video")
-                    ? `<video src="${m.url}" preload="none"></video><div class="play-icon">▶️</div>`
-                    : `<img src="${m.thumb || m.url}" loading="lazy"/>`}
-                </div>`).join("")}
-            </div>` : ""}
-          <label class="upload-btn">
-            ${uploading ? "⏳ Enviando..." : "📷 Adicionar foto ou vídeo"}
-            <input type="file" accept="image/*,video/*" multiple style="display:none"
-                   onchange="handleUpload(event,${day.id})" ${uploading ? "disabled" : ""} />
-          </label>
-
-          <div class="section-divider" style="margin-top:14px"><div></div><span>Diário do dia</span><div></div></div>
-          <textarea class="diary-textarea" id="diary-${day.id}"
-                    placeholder="Como foi o dia? O que vocês sentiram, viram, descobriram...">${diary}</textarea>
-          <button class="btn-save" onclick="saveDiary(${day.id})">💾 Salvar diário</button>
-        </div>
-      ` : `
+      ${day.tip   ? `<div class="box-tip">💡 ${day.tip}</div>`   : ""}
+      ${day.paleo ? `<div class="box-paleo">${day.paleo}</div>` : ""}
+      ${day.alert ? `<div class="box-alert">${day.alert}</div>` : ""}
+      ${state.token ? renderMediaSection(day) : `
         <div class="drive-cta">
           <p>🔗 Conecte o Google Drive para adicionar fotos e escrever o diário</p>
           <button class="btn-drive" onclick="signIn()">Conectar Drive</button>
-        </div>
-      `}
+        </div>`}
     </div>
   `;
 }
 
-// ─── RESERVAS VIEW ───────────────────────────────────────────────────────────
+// ─── MEDIA SECTION ───────────────────────────────────────────────────────────
+function renderMediaSection(day) {
+  const mediaList = state.media[day.id] || [];
+  const diary     = state.diaries[day.id] || "";
+  const uploading = state.uploading[day.id];
+  return `
+    <div class="media-section">
+      <div class="section-divider"><div></div><span>Fotos e Vídeos</span><div></div></div>
+      ${mediaList.length ? `
+        <div class="media-grid">
+          ${mediaList.map(m => `
+            <div class="media-thumb" onclick="openLightbox('${m.url}','${m.mimeType}')">
+              ${m.mimeType.startsWith("video")
+                ? `<video src="${m.url}" preload="none"></video><div class="play-icon">▶️</div>`
+                : `<img src="${m.thumb || m.url}" loading="lazy"/>`}
+            </div>`).join("")}
+        </div>` : ""}
+      <label class="upload-btn">
+        ${uploading ? "⏳ Enviando..." : "📷 Adicionar foto ou vídeo"}
+        <input type="file" accept="image/*,video/*" multiple style="display:none"
+               onchange="handleUpload(event,${day.id})" ${uploading ? "disabled" : ""} />
+      </label>
+      <div class="section-divider" style="margin-top:14px"><div></div><span>Diário do dia</span><div></div></div>
+      <textarea class="diary-textarea" id="diary-${day.id}"
+                placeholder="Como foi o dia? O que vocês sentiram, viram, descobriram...">${diary}</textarea>
+      <button class="btn-save" onclick="saveDiary(${day.id})">💾 Salvar diário</button>
+    </div>
+  `;
+}
+
+// ─── RESERVAS VIEW ────────────────────────────────────────────────────────────
 function renderReservasView() {
   const done = Object.values(state.reservas).filter(Boolean).length;
   const pct  = Math.round(done / RESERVAS.length * 100);
@@ -213,7 +301,7 @@ function renderReservasView() {
   `;
 }
 
-// ─── PALEO VIEW ──────────────────────────────────────────────────────────────
+// ─── PALEO VIEW ───────────────────────────────────────────────────────────────
 function renderPaleoView() {
   return `
     <div class="card mb-16">
@@ -247,7 +335,7 @@ function renderPaleoView() {
   `;
 }
 
-// ─── USUARIOS VIEW ───────────────────────────────────────────────────────────
+// ─── USUARIOS VIEW ────────────────────────────────────────────────────────────
 function renderUsuariosView() {
   return `
     <div class="card mb-16">
@@ -273,7 +361,7 @@ function renderUsuariosView() {
   `;
 }
 
-// ─── MODALS ──────────────────────────────────────────────────────────────────
+// ─── MODALS ───────────────────────────────────────────────────────────────────
 function renderAddPinModal() {
   const { lat, lng } = state.addingPin;
   return `
@@ -294,7 +382,7 @@ function renderAddPinModal() {
         <input id="pin-note" class="field-input" placeholder="ex: Aberto das 8h às 18h, entrada $35 USD" />
         <div class="modal-actions">
           <button class="btn-primary" onclick="savePin()">📍 Salvar ponto</button>
-          <button class="btn-cancel" onclick="setState({addingPin:null})">Cancelar</button>
+          <button class="btn-cancel"  onclick="setState({addingPin:null})">Cancelar</button>
         </div>
       </div>
     </div>`;
