@@ -69,6 +69,7 @@ async function loadCloudData() {
     checked:  data.checked  || {},
     reservas: data.reservas || {},
     pins:     data.pins     || [],
+    pinsDone: data.pinsDone || {},
   });
 }
 
@@ -79,6 +80,7 @@ async function saveCloudData() {
     checked:  state.checked,
     reservas: state.reservas,
     pins:     state.pins,
+    pinsDone: state.pinsDone || {},
   });
   const q = `'${state.folderId}' in parents and name='data.json' and trashed=false`;
   const list = await driveAPI(`/files?q=${encodeURIComponent(q)}&fields=files(id)`);
@@ -147,8 +149,6 @@ async function uploadFile(dayId, file) {
 }
 
 async function addTestUser(email) {
-  // This adds a test user to the OAuth consent screen via API is not possible client-side
-  // Instead we store emails locally and show instructions
   const users = [...(state.testUsers || []), email];
   setState({ testUsers: users });
 }
